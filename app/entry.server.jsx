@@ -22,6 +22,17 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    defaultSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://shopify.com',
+      'http://localhost:*',
+    ],
+    scriptSrc: ["'self'", 'https://cdn.shopify.com'],
+    styleSrc: ["'self'", 'https://cdn.shopify.com', "'unsafe-inline'"],
+    imgSrc: ["'self'", 'https://cdn.shopify.com', 'https://shopify.com', 'data:'],
+    mediaSrc: ["'self'", 'https://cdn.shopify.com', 'https://icecubetest.myshopify.com'], // Add media-src
+    connectSrc: ["'self'", 'https://monorail-edge.shopifysvc.com', 'https://icecubetest.myshopify.com'], // Optional: for API calls
   });
 
   const body = await renderToReadableStream(

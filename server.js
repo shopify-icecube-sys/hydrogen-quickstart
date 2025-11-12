@@ -41,6 +41,18 @@ export default {
         );
       }
 
+      //Add Content Security Policy
+      const cspDirectives = [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.shopify.com",
+        "style-src 'self' 'unsafe-inline'",
+        "media-src 'self' https://cdn.shopify.com https://*.myshopify.com",
+        "img-src 'self' data: https://cdn.shopify.com https://*.myshopify.com",
+        "connect-src 'self' https://monorail-edge.shopifysvc.com https://icecubedev.myshopify.com http://localhost:* ws://localhost:* ws://127.0.0.1:* ws://*.tryhydrogen.dev:* https://cdn.shopify.com",
+      ];
+
+      response.headers.set('Content-Security-Policy', cspDirectives.join('; '));
+
       if (response.status === 404) {
         /**
          * Check for redirects only when there's a 404 from the app.

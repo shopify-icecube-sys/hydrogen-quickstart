@@ -10,10 +10,12 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import favicon from '~/assets/favicon.svg';
-import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {FOOTER_QUERY, HEADER_QUERY, SITE_SETTINGS_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import "keen-slider/keen-slider.min.css";
+import '~/styles/output.css';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -82,11 +84,102 @@ export async function loader(args) {
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
       withPrivacyBanner: false,
-      // localize the privacy banner
-      country: args.context.storefront.i18n.country,
-      language: args.context.storefront.i18n.language,
     },
   };
+}
+
+/**
+ * Handle newsletter subscription and other form actions
+ * @param {ActionFunctionArgs}
+ */
+export async function action({request, context}) {
+  const {storefront} = context;
+  
+  try {
+    const formData = await request.formData();
+    const intent = String(formData.get('intent') || '');
+    
+    if (intent === 'newsletter') {
+      const email = String(formData.get('email') || '').trim();
+      
+      if (!email) {
+        return data({error: 'Email is required'}, {status: 400});
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return data({error: 'Please enter a valid email address'}, {status: 400});
+      }
+
+      // Create customer with marketing consent using Shopify Storefront API
+      const CREATE_CUSTOMER_MUTATION = `
+        mutation customerCreate($input: CustomerCreateInput!) {
+          customerCreate(input: $input) {
+            customer {
+              id
+              email
+              acceptsMarketing
+            }
+            customerUserErrors {
+              field
+              message
+              code
+            }
+          }
+        }
+      `;
+
+      const variables = {
+        input: {
+          email: email,
+          acceptsMarketing: true,
+        },
+      };
+
+      const {data: result} = await storefront.mutate(CREATE_CUSTOMER_MUTATION, {
+        variables,
+      });
+
+      // Handle customer creation response
+      if (result?.customerCreate?.customerUserErrors?.length > 0) {
+        const errors = result.customerCreate.customerUserErrors;
+        const takenError = errors.find(error => error.code === 'TAKEN');
+        
+        if (takenError) {
+          // Customer already exists - this is success for newsletter signup
+          return data({
+            success: true,
+            message: 'Thanks for subscribing'
+          });
+        }
+        
+        // Other validation errors
+        const errorMessage = errors[0]?.message || 'Failed to subscribe to newsletter';
+        return data({error: errorMessage}, {status: 400});
+      }
+
+      // Success case - new customer created
+      if (result?.customerCreate?.customer) {
+        return data({
+          success: true,
+          message: 'Thanks for subscribing'
+        });
+      }
+
+      // Fallback error
+      return data({error: 'Failed to subscribe to newsletter'}, {status: 500});
+    }
+
+    // Handle other intents here if needed
+    return data({error: 'Invalid action'}, {status: 400});
+
+  } catch (error) {
+    console.error('Action error:', error);
+    return data({
+      error: 'An unexpected error occurred. Please try again later.'
+    }, {status: 500});
+  }
 }
 
 /**
@@ -97,17 +190,22 @@ export async function loader(args) {
 async function loadCriticalData({context}) {
   const {storefront} = context;
 
-  const [header] = await Promise.all([
+  const [header, siteSettings] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
-        headerMenuHandle: 'main-menu', // Adjust to your header menu handle
+        headerMenuHandle: 'hydrogen-menu', // Adjust to your header menu handle
       },
     }),
-    // Add other queries here, so that they are loaded in parallel
+    storefront.query(SITE_SETTINGS_QUERY, {
+      cache: storefront.CacheNone(),
+    }),
   ]);
 
-  return {header};
+  return {
+    header,
+    siteSettings,
+  };
 }
 
 /**
@@ -124,7 +222,7 @@ function loadDeferredData({context}) {
     .query(FOOTER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
-        footerMenuHandle: 'footer', // Adjust to your footer menu handle
+        footerMenuHandle: 'hydrogen-footer-menu', // Adjust to your footer menu handle
       },
     })
     .catch((error) => {
@@ -154,6 +252,7 @@ export function Layout({children}) {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
+         {/* <link rel="stylesheet" href={tailwindStyles} /> */}
         <Meta />
         <Links />
       </head>

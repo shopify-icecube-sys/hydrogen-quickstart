@@ -231,3 +231,15 @@ export const FOOTER_QUERY = `#graphql
   }
   ${MENU_FRAGMENT}
 `;
+
+export const SITE_SETTINGS_QUERY = `#graphql
+  query SiteSettings {
+    metaobject(handle: {type: "newsletter_setting", handle: "be-the-first-to-hear-about-new-products-founder-updates-and-everything-atoms"}) {
+      handle
+      fields {
+        key
+        value
+      }
+    }
+  }
+`;

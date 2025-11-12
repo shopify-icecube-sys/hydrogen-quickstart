@@ -9,19 +9,27 @@
     "dev": "shopify hydrogen dev --codegen",
     "preview": "shopify hydrogen preview --build",
     "lint": "eslint --no-error-on-unmatched-pattern .",
-    "codegen": "shopify hydrogen codegen"
+    "codegen": "shopify hydrogen codegen",
+    "start": "node server.js"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
+    "@graphiql/react": "^0.37.1",
+    "@graphiql/toolkit": "^0.11.3",
     "@shopify/hydrogen": "2025.5.0",
     "@shopify/remix-oxygen": "^3.0.0",
+    "@tailwindcss/cli": "^4.1.13",
+    "graphiql": "^5.2.0",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
+    "hls.js": "^1.6.12",
     "isbot": "^5.1.22",
+    "keen-slider": "^6.8.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "7.6.0",
-    "react-router-dom": "7.6.0"
+    "react-router-dom": "7.6.0",
+    "swiper": "^12.0.1"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",
@@ -35,12 +43,14 @@
     "@shopify/mini-oxygen": "^3.2.1",
     "@shopify/oxygen-workers-types": "^4.1.6",
     "@shopify/prettier-config": "^1.1.2",
+    "@tailwindcss/postcss": "^4.1.13",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/eslint": "^9.6.1",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-import-resolver-typescript": "^3.7.0",
@@ -51,12 +61,19 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.1.0",
     "globals": "^15.14.0",
+    "postcss": "^8.5.6",
     "prettier": "^3.4.2",
+    "tailwindcss": "^4.1.13",
     "typescript": "^5.2.2",
     "vite": "^6.2.4",
     "vite-tsconfig-paths": "^4.3.1"
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "description": "Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dovetail with [Remix](https://remix.run/), Shopify’s full stack web framework. This template contains a **minimal setup** of components, queries and tooling to get started with Hydrogen.",
+  "main": ".graphqlrc.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
