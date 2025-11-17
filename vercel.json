@@ -1,0 +1,11 @@
+{
+  "version": 3,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/server/index.js"
+    }
+  ]
+}
