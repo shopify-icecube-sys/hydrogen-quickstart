@@ -2,7 +2,7 @@ export default function ImageWithText({ image, heading, description, buttonLabel
   if (!image) return null;
 
   return (
-    <section className="image-with-text text">
+    <section className="image-with-text">
       {/* Left: Image */}
       <div className="iwt-image">
         <img
